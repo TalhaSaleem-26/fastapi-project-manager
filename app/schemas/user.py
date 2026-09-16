@@ -50,3 +50,8 @@ class UserWithTasks(SQLModel):
     username:str
     email:str
     tasks:list["Task"]
+    
+    
+class UserLogin(SQLModel):
+    email: str
+    password: str

@@ -62,3 +62,8 @@ def delete_by_id(userid:str,session: Session)->User|None:
     session.delete(query)
     
     
+
+def getuserby_email(email:str,session: Session)->User|None:
+    statement=select(User).where(User.email==email)
+    query=session.exec(statement).first()
+    return query

@@ -1,9 +1,9 @@
 from sqlmodel import Session 
 from fastapi import APIRouter ,Depends
 from app.models.user import User
-from app.schemas.user import UserRead,UserCreate,UserUpdate,UserWithTasks
+from app.schemas.user import UserRead,UserCreate,UserUpdate,UserWithTasks ,UserLogin
 from app.db.session import get_session
-from app.services.user_service import create_user_service , get_all_user_service,getuserby_id,updateuserby_id,deleteuserby_id , getting_user_tasks
+from app.services.user_service import create_user_service , get_all_user_service,getuserby_id,updateuserby_id,deleteuserby_id , getting_user_tasks , login_user_service
 userrouter=APIRouter(
     prefix='/user',
     tags=["User"]
@@ -34,3 +34,8 @@ def delete_by_id(userid:str,session: Session=Depends(get_session))->User:
 @userrouter.get("/{userid}/task",response_model=UserWithTasks)
 def user_tasks(userid:str,session: Session=Depends(get_session))->UserWithTasks:
     return getting_user_tasks(userid,session)
+
+
+@userrouter.post('/login',response_model=UserRead)
+def login_user(user:UserLogin,session: Session=Depends(get_session))->UserRead:
+    return login_user_service(user,session)
