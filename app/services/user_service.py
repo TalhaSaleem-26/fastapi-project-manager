@@ -1,9 +1,10 @@
 from app.models.user import User
 from fastapi import HTTPException
 from sqlmodel import Session , select
-from app.schemas.user import UserCreate,UserRead,UserUpdate,UserWithTasks ,UserLogin
-from app.core.security import hash_password , verify_password
+from app.schemas.user import UserCreate,UserRead,UserUpdate,UserWithTasks ,UserLogin ,Token
+from app.core.security import hash_password , verify_password , create_access_token
 from app.repositories.user_repositories import create_user_repository,find_user_by_username,get_all_user_repository,find_user_by_id,updateuser_data,delete_by_id ,getuserby_email
+
 def create_user_service(user: UserCreate , session: Session)->UserRead:
     hashpassword=hash_password(user.password)
     newuser=User(
@@ -65,7 +66,7 @@ def getting_user_tasks(userid:str,session: Session)->UserWithTasks:
     return user
     
     
-def login_user_service(user:UserLogin,session: Session)->UserRead:
+def login_user_service(user:UserLogin,session: Session)->Token:
     Loginuser=getuserby_email(user.email ,session)
     
     if not Loginuser:
@@ -80,9 +81,18 @@ def login_user_service(user:UserLogin,session: Session)->UserRead:
         raise HTTPException(
             status_code=400,
             detail='Password Doesnot Match'
+    )
+    
+    token= create_access_token(
+            {
+                "sub":Loginuser.id,
+                
+            }
         )
-    
-    
-    else :
         
-        return Loginuser
+    return {
+         "access_token": token,
+    "token_type": "bearer"
+    }
+    
+    
