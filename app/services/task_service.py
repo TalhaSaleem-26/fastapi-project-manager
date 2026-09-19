@@ -1,7 +1,8 @@
-from app.models.task import Task
+from app.models.task import Task 
+from app.models.user import User
 from app.schemas.task import TaskCreate,TaskUpdate, TaskRead
 from fastapi import HTTPException
-from app.repositories.task_repositories import create,getall,findby_id,updatetask,deleteTask,update_data_patch
+from app.repositories.task_repositories import create,getall,findby_id,updatetask,deleteTask,update_data_patch ,my_task_repo
 from app.repositories.user_repositories import find_user_by_id
 from sqlmodel import Session
 def creating_task(task: TaskCreate, session: Session) -> Task:
@@ -72,3 +73,12 @@ def getting_user_by_task(taskid:str,session: Session)->TaskRead:
     task=task_by_id(taskid,session)
     
     return task
+
+
+def getting_my_tasks(current_user:User,session: Session)-> list[Task]:
+    task=my_task_repo(current_user,session)
+    
+    if not task :
+         return []
+        
+    return task 

@@ -95,4 +95,4 @@ def login_user_service(user:UserLogin,session: Session)->Token:
     "token_type": "bearer"
     }
     
-    
+

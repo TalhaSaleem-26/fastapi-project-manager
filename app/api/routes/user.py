@@ -1,6 +1,7 @@
 from sqlmodel import Session 
 from fastapi import APIRouter ,Depends
 from app.models.user import User
+from app.core.security import get_current_user
 from app.schemas.user import UserRead,UserCreate,UserUpdate,UserWithTasks ,UserLogin ,Token
 from app.db.session import get_session
 from app.services.user_service import create_user_service , get_all_user_service,getuserby_id,updateuserby_id,deleteuserby_id , getting_user_tasks , login_user_service
@@ -13,6 +14,9 @@ def create_user(user:UserCreate,session:Session=Depends(get_session))->UserRead:
     
     return create_user_service(user,session)
 
+@userrouter.get("/me", response_model=UserRead)
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 @userrouter.get('/getall',response_model=list[UserRead])
 def get_all_user(session: Session=Depends(get_session))->list[UserRead]:

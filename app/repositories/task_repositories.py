@@ -2,6 +2,7 @@ from sqlmodel import Session,select
 from app.models.task import Task
 from app.schemas.task import TaskUpdate
 from fastapi import HTTPException
+from app.models.user import User
 
 def create(task: Task,session:Session):
     session.add(task)
@@ -76,3 +77,9 @@ def update_data_patch(
     session.refresh(query)
 
     return query
+
+def my_task_repo(current_user:User,session: Session)->list[Task]:
+    query=select(Task).where(Task.user_id==current_user.id)
+    statement=session.exec(query).all()
+    
+    return statement
