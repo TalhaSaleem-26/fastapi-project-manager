@@ -1,7 +1,7 @@
 from pwdlib import PasswordHash
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
-
+from app.models.user import User
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
@@ -71,3 +71,12 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+def auth_admin(currentuser: User = Depends(get_current_user)) -> User:
+    if currentuser.role == "admin":
+        return currentuser
+
+    raise HTTPException(
+        status_code=403,
+        detail="Unauthorized access"
+    )

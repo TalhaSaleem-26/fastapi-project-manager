@@ -45,16 +45,20 @@ def updatetask(taskid: str,task: TaskUpdate,session: Session)->Task:
     
 
 
-def deleteTask(taskid:str , session : Session)->Task | None:
-    statement=select(Task).where(Task.id==taskid)
-    query=session.exec(statement).first()
-    if (query):
+def deleteTask(taskid: str, userid: str, session: Session) -> Task | None:
+    statement = select(Task).where(
+        Task.id == taskid,
+        Task.user_id == userid
+    )
+
+    query = session.exec(statement).first()
+
+    if query:
         session.delete(query)
         session.commit()
         return query
-    else :
-        return None
-    
+
+    return None
 def update_data_patch(
     taskid: str,
     task: TaskUpdate,

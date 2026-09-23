@@ -28,16 +28,26 @@ def creating_task(task: TaskCreate, session: Session) -> Task:
 def getting_all_tasks(session: Session)-> list[Task]:
     return getall(session)
 
-def task_by_id(taskid:str,session: Session)->Task | None:
-    task= findby_id(taskid,session)
-    if(task):
-        return task
-    else :
+
+def task_by_id(taskid: str, currentuser: User, session: Session) -> Task:
+    task = findby_id(taskid, session)
+
+    if not task:
         raise HTTPException(
-    status_code=404,
-    detail="Task not found"
-)
-        
+            status_code=404,
+            detail="Task not found"
+        )
+
+    if currentuser.id != task.user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized to access this task"
+        )
+
+    return task
+
+
+
 def update_by_id(taskid:str ,task: TaskUpdate , session: Session)->Task:
     data=updatetask(taskid,task,session)
     if(data):
@@ -49,15 +59,17 @@ def update_by_id(taskid:str ,task: TaskUpdate , session: Session)->Task:
         )
     
     
-def delete_task(taskid:str,session: Session)->Task |None:
-    data= deleteTask(taskid,session)
-    if(data):
+def delete_task(taskid: str, currentuser: User, session: Session) -> Task | None:
+
+    data = deleteTask(taskid, currentuser.id, session)
+
+    if data:
         return data
-    else :
-        raise HTTPException(
-            status_code=404,
-            detail="Data Not Found"
-        )
+
+    raise HTTPException(
+        status_code=404,
+        detail="Data Not Found"
+    )
         
 def patch_dataupdate(taskid:str,task:TaskUpdate,session: Session)->Task:
     data=update_data_patch(taskid,task,session)
@@ -82,3 +94,4 @@ def getting_my_tasks(current_user:User,session: Session)-> list[Task]:
          return []
         
     return task 
+
